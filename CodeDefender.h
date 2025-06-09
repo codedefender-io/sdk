@@ -22,6 +22,21 @@ SOFTWARE. */
 
 #ifndef CODEDEFENDER_H
 #define CODEDEFENDER_H
-#define CODEDEFENDER(Func, Scope) \
-    __pragma(comment(linker, "/export:CODEDEFENDER_" #Scope "_" #Func "=" #Func))
+#ifdef __cplusplus
+#define CD_EXTERN_C extern "C"
+#else
+#define CD_EXTERN_C
+#endif
+
+// Use this to wrap your function definitions
+#define CODEDEFENDER(ReturnType, Func, Scope) \
+    CD_EXTERN_C __declspec(noinline) \
+    __pragma(comment(linker, "/export:CODEDEFENDER_" #Scope "_" #Func "=" #Func)) \
+    ReturnType Func
+
+// Only use this if you want to actually export the function and obfuscate it as well.
+#define CODEDEFENDER2(ReturnType, Func, Scope) \
+    CD_EXTERN_C __declspec(dllexport) __declspec(noinline) \
+    __pragma(comment(linker, "/export:CODEDEFENDER_" #Scope "_" #Func "=" #Func)) \
+    ReturnType Func
 #endif

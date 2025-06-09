@@ -32,12 +32,16 @@ To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project.
 #include <stdio.h>
 #include "CodeDefender.h"
 
-int main(int argc, const char** argv) {
-  printf("Hello World!");
+CODEDEFENDER(int, addint, Profile1)(int a, int b);
+CODEDEFENDER(int, main, Profile1)(int argc, const char** argv);
+
+int addint(int a, int b) {
+	return a + b;
 }
 
-// Obfuscate 'main' with obfuscation settings in 'Profile1'
-CODEDEFENDER(main, Profile1);
+int main(int argc, const char** argv) {
+    return addint(argc, argc);
+}
 ```
 
 **⚠️ The profile name cannot have any underscores spaces or non alpha-numeric symbols! ⚠️**
