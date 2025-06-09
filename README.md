@@ -38,6 +38,6 @@ Profiles are defined within the configuration file created on the SaaS (https://
 
 This provides an easy to obfuscate functions with pre-defined obfuscation settings.
 
-### Does this create unwanted exports?
+### Doesnt this macro create unwanted exports?
 
-No. CodeDefender will process your file and remove these exported functions from the export directory so that the export directory is not cluttered with unwanted exports.
+No. CodeDefender will process your file and remove the exported functions created from the macro from the export directory so that the export directory is not cluttered with unwanted exports.
