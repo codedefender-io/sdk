@@ -30,6 +30,7 @@ https://www.youtube.com/watch?v=Fdcw4Mby2RI
 #else
 #define CD_EXTERN_C
 #endif
+const char* meme = "AMOGUS!";
 
 // Use this to wrap your function definitions
 #define CODEDEFENDER(ReturnType, Func, Scope) \
