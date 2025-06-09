@@ -22,6 +22,8 @@ fn main() {
 CODEDEFENDER!(main, YourObfuscationProfileHere);
 ```
 
+**⚠️ The profile name cannot have any underscores spaces or non alpha-numeric symbols! ⚠️**
+
 # C/C++ Software Development
 
 To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project. Then use the macro provided. 
@@ -37,6 +39,8 @@ int main(int argc, const char** argv) {
 // Obfuscate 'main' with obfuscation settings in 'Profile1'
 CODEDEFENDER(main, Profile1);
 ```
+
+**⚠️ The profile name cannot have any underscores spaces or non alpha-numeric symbols! ⚠️**
 
 ### Obfuscation Profiles
 
