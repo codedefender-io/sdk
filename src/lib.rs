@@ -1,5 +1,6 @@
 #![no_std]
 #![cfg(target_os = "windows")] // We only support 64bit-PE files for now!
+#![doc = include_str!("../README.md")]
 
 /// A macro used to mark a function for obfuscation by [CodeDefender.io](https://codedefender.io)
 /// using a specific obfuscation profile.
