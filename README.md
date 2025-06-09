@@ -12,6 +12,16 @@ cargo add codedefender
 
 This will include the rust crate that contains the macro `CODEDEFENDER!`.
 
+```rust
+use codedefender::CODEDEFENDER;
+
+fn main() {
+  println!("Hello World!");
+}
+
+CODEDEFENDER!(main, YourObfuscationProfileHere);
+```
+
 # C/C++ Software Development
 
 To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project. Then use the macro provided. 
@@ -21,7 +31,7 @@ To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project.
 #include "CodeDefender.h"
 
 int main(int argc, const char** argv) {
-    printf("Hello World!");
+  printf("Hello World!");
 }
 
 // Obfuscate 'main' with obfuscation settings in 'Profile1'
