@@ -6,7 +6,7 @@ authors = ["Back Engineering Labs, Inc <contact@back.engineering>"]
 description = "A macro used to mark a function for obfuscation by CodeDefender"
 license = "MIT"
 repository = "https://github.com/codedefender-io/sdk"
-keywords = ["CodeDefender", "dll", "windows", "export", "linker", "macro"]
+keywords = ["windows", "export", "linker", "macro"]
 categories = ["development-tools", "no-std"]
 
 [lib]
