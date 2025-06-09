@@ -35,7 +35,7 @@ macro_rules! CODEDEFENDER {
             }
 
             #[used]
-            #[link_section = ".drectve"]
+            #[unsafe(link_section = ".drectve")]
             static _CODEDEFENDER_EXPORT: [u8; EXPORT_STR.len()] = *to_array(EXPORT_STR);
         };
     };
