@@ -1,4 +1,18 @@
-# C/C++ Software Development Kit
+![windows-only](https://img.shields.io/badge/platform-windows-blue)
+
+**⚠️ CodeDefender only supports Windows targets at the moment. ⚠️**
+
+# Rust Software Development
+
+Simply add codedefender to your rust project with the following command:
+
+```sh
+cargo add codedefender
+```
+
+This will include the rust crate that contains the macro `CODEDEFENDER!`.
+
+# C/C++ Software Development
 
 To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project. Then use the macro provided. 
 
