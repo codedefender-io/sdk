@@ -25,21 +25,52 @@ https://www.youtube.com/watch?v=Fdcw4Mby2RI
 
 #ifndef CODEDEFENDER_H
 #define CODEDEFENDER_H
-#ifdef __cplusplus
-#define CD_EXTERN_C extern "C"
+#if defined(_MSC_VER)
+#pragma pack(push, 1)
+typedef struct CodeDefenderMacro {
+  void* pFunc;
+  const char* pProfile;
+} CodeDefenderMacro;
+#pragma pack(pop)
 #else
-#define CD_EXTERN_C
+typedef struct __attribute__((packed)) CodeDefenderMacro {
+  void* pFunc;
+  const char* pProfile;
+} CodeDefenderMacro;
 #endif
 
-// Use this to wrap your function definitions
-#define CODEDEFENDER(ReturnType, Func, Scope) \
-    CD_EXTERN_C __declspec(noinline) \
-    __pragma(comment(linker, "/export:CODEDEFENDER_" #Scope "_" #Func "=" #Func)) \
-    ReturnType Func
+#if defined(__cplusplus)
+#define EXTERN_C extern "C"
+#else
+#define EXTERN_C extern
+#endif
 
-// Only use this if you want to actually export the function and obfuscate it as well.
-#define CODEDEFENDER2(ReturnType, Func, Scope) \
-    CD_EXTERN_C __declspec(dllexport) __declspec(noinline) \
-    __pragma(comment(linker, "/export:CODEDEFENDER_" #Scope "_" #Func "=" #Func)) \
-    ReturnType Func
+#if defined(_MSC_VER)
+#define CODEDEFENDER_SECTION EXTERN_C __declspec(allocate(".cdmacro"))
+#pragma section(".cdmacro", read)
+
+#define CODEDEFENDER_STRINGIFY2(x) #x
+#define CODEDEFENDER_STRINGIFY(x) CODEDEFENDER_STRINGIFY2(x)
+
+#define CODEDEFENDER_PRAGMA_LINKER_INCLUDE(symbol) \
+  __pragma(comment(linker, "/INCLUDE:" symbol))
+#define CODEDEFENDER_SYMBOL_NAME(fn) \
+  "_"                                \
+  " __cdmacro_entry_" #fn
+
+#define CODEDEFENDER(Profile, ReturnType, Func, Body)                     \
+  __declspec(noinline) ReturnType Func Body;                              \
+  CODEDEFENDER_SECTION const CodeDefenderMacro __cdmacro_entry_##Func = { \
+      (void*)(Func), Profile};                                            \
+  CODEDEFENDER_PRAGMA_LINKER_INCLUDE(                                     \
+      CODEDEFENDER_STRINGIFY(__cdmacro_entry_##Func));
+
+#elif defined(__GNUC__) || defined(__clang__)
+#define CODEDEFENDER_SECTION __attribute__((section(".cdmacro"), used))
+#define NOINLINE __attribute__((noinline))
+
+#define CODEDEFENDER(Profile, ReturnType, Func, Body)                        \
+  NOINLINE ReturnType Func Body CODEDEFENDER_SECTION const CodeDefenderMacro \
+      __cdmacro_entry_##Func = {(void*)(Func), Profile};
+#endif
 #endif

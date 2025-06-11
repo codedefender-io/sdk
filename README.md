@@ -13,16 +13,14 @@ cargo add codedefender
 This will include the rust crate that contains the macro `CODEDEFENDER!`.
 
 ```rust
-use codedefender::CODEDEFENDER;
+use codedefender::*;
 
-fn main() {
-  println!("Hello World!");
-}
-
-CODEDEFENDER!(main, YourObfuscationProfileHere);
+/// Obfuscate addint with obfuscation settings in "Profile1"
+CODEDEFENDER!("Profile1", fn addint(x: i32, y: i32) -> i32 {
+    println!("add({}, {})", x, y);
+    x + y
+});
 ```
-
-**⚠️ The profile name cannot have any underscores spaces or non alpha-numeric symbols! ⚠️**
 
 # C/C++ Software Development
 
@@ -32,19 +30,19 @@ To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project.
 #include <stdio.h>
 #include "CodeDefender.h"
 
-CODEDEFENDER(int, addint, Profile1)(int a, int b);
-CODEDEFENDER(int, main, Profile1)(int argc, const char** argv);
+CODEDEFENDER("Profile1", int, add,
+(int a, int b) {
+    printf("add(%d, %d)\n", a, b);
+    return a + b;
+});
 
-int addint(int a, int b) {
-	return a + b;
-}
-
-int main(int argc, const char** argv) {
-    return addint(argc, argc);
-}
+CODEDEFENDER("Profile1", int, main,
+(int argc, char** argv) {
+    int result = add(3, 5);
+    printf("Result: %d\n", result);
+    return 0;
+});
 ```
-
-**⚠️ The profile name cannot have any underscores spaces or non alpha-numeric symbols! ⚠️**
 
 ### Obfuscation Profiles
 
@@ -69,7 +67,3 @@ Profiles are defined within the configuration file created on the SaaS (https://
 ```
 
 This provides an easy to obfuscate functions with pre-defined obfuscation settings.
-
-### Doesnt this macro create unwanted exports?
-
-No. CodeDefender will process your file and remove the exported functions created from the macro from the export directory so that the export directory is not cluttered with unwanted exports.

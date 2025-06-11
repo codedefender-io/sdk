@@ -2,41 +2,29 @@
 #![cfg(target_os = "windows")] // We only support 64bit-PE files for now!
 #![doc = include_str!("../README.md")]
 
-/// A macro used to mark a function for obfuscation by [CodeDefender.io](https://codedefender.io)
-/// using a specific obfuscation profile.
-///
-/// # Example
-///
-/// ```
-/// use codedefender::CODEDEFENDER;
-///
-/// fn main() {
-///     println!("Hello World!");
-/// }
-///
-/// CODEDEFENDER!(main, YourObfuscationProfileHere);
-/// ```
+#[repr(C, packed)]
+pub struct CodeDefenderMacro {
+    pub p_func: *const (),
+    pub p_profile: *const u8,
+}
+
+unsafe impl Sync for CodeDefenderMacro {}
+pub use paste::paste;
+
 #[macro_export]
 macro_rules! CODEDEFENDER {
-    ($func:ident, $scope:ident) => {
-        const _: () = {
-            const EXPORT_STR: &str = concat!(
-                "/export:CODEDEFENDER_",
-                stringify!($scope),
-                "_",
-                stringify!($func),
-                "=",
-                stringify!($func),
-                "\0"
-            );
+    ($profile:expr, fn $name:ident($($arg:ident : $argty:ty),*) -> $ret:ty $body:block) => {
+        #[unsafe(no_mangle)]
+        #[inline(never)]
+        pub extern "C" fn $name($($arg: $argty),*) -> $ret $body
 
-            const fn to_array(s: &str) -> &[u8; EXPORT_STR.len()] {
-                unsafe { &*(s.as_bytes() as *const [u8] as *const [u8; EXPORT_STR.len()]) }
-            }
-
+        paste! {
             #[used]
-            #[unsafe(link_section = ".drectve")]
-            static _CODEDEFENDER_EXPORT: [u8; EXPORT_STR.len()] = *to_array(EXPORT_STR);
-        };
+            #[unsafe(link_section = ".cdmacro")]
+            static [<CDMACRO_ENTRY_$name:upper>]: codedefender::CodeDefenderMacro = codedefender::CodeDefenderMacro {
+                p_func: $name as *const (),
+                p_profile: concat!($profile, "\0").as_ptr(),
+            };
+        }
     };
 }
