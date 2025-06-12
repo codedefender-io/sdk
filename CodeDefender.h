@@ -51,13 +51,13 @@ SOFTWARE.
   " __cdmacro_entry_" #fn
 
 // https://www.youtube.com/watch?v=ss142Aix2Bo
-#define CODEDEFENDER(Profile, ReturnTy, Func, Params) \
-  CODEDEFENDER_NOINLINE ReturnTy Func Params;         \
-  CODEDEFENDER_SECTION const struct {                 \
-    void* pFunc;                                      \
-    char str[sizeof(Profile)];                        \
-  } __cdmacro_entry_##Func = {(void*)Func, Profile};  \
-  CODEDEFENDER_PRAGMA_LINKER_INCLUDE(__cdmacro_entry_##Func)
+#define CODEDEFENDER(Profile, ReturnTy, Func, Params)                        \
+  CODEDEFENDER_NOINLINE ReturnTy Func Params;                                \
+  __pragma(pack(push, 1)) __declspec(align(1)) CODEDEFENDER_SECTION struct { \
+    void* pFunc;                                                             \
+    char str[sizeof(Profile)];                                               \
+  } __cdmacro_entry_##Func = {(void*)Func, Profile};                         \
+  __pragma(pack(pop)) CODEDEFENDER_PRAGMA_LINKER_INCLUDE(__cdmacro_entry_##Func)
 
 #elif defined(__GNUC__) || defined(__clang__)
 #define CODEDEFENDER_SECTION __attribute__((section(".cdmacro"), used))
