@@ -7,7 +7,6 @@ use syn::{Expr, ItemFn, parse_macro_input};
 pub fn codedefender(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_fn = parse_macro_input!(item as ItemFn);
     let profile_expr = parse_macro_input!(attr as Expr);
-
     let profile_str = match profile_expr {
         syn::Expr::Lit(syn::ExprLit {
             lit: syn::Lit::Str(lit),
@@ -20,15 +19,16 @@ pub fn codedefender(attr: TokenStream, item: TokenStream) -> TokenStream {
     let upper_name = fn_name.to_string().to_uppercase();
     let struct_name = format_ident!("CDMacroEntry_{}", upper_name);
     let static_ident = format_ident!("CDMACRO_STATIC_{}", upper_name);
-    let profile_bytes = profile_str.as_bytes();
-    let profile_len = profile_bytes.len() + 1;
+    let mut profile_bytes = profile_str.into_bytes();
+    profile_bytes.push(0);
+    let profile_len = profile_bytes.len();
+    let byte_tokens = profile_bytes.iter().map(|b| quote! { #b });
 
     let expanded = quote! {
-        #[no_mangle]
         #[inline(never)]
         #input_fn
 
-        #[repr(C)]
+        #[repr(C, packed)]
         struct #struct_name {
             p_func: *const (),
             p_profile: [u8; #profile_len],
@@ -37,10 +37,10 @@ pub fn codedefender(attr: TokenStream, item: TokenStream) -> TokenStream {
         unsafe impl Sync for #struct_name {}
 
         #[used]
-        #[link_section = ".cdmacro"]
+        #[unsafe(link_section = ".cdmacro")]
         static #static_ident: #struct_name = #struct_name {
             p_func: #fn_name as *const (),
-            p_profile: *b concat!(#profile_str, "\0"),
+            p_profile: [#(#byte_tokens),*],
         };
     };
 
