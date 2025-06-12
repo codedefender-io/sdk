@@ -30,18 +30,12 @@ To use CodeDefender SDK simply include "codedefender.h" into your C/C++ project.
 #include <stdio.h>
 #include "CodeDefender.h"
 
-CODEDEFENDER("Profile1", int, add,
-(int a, int b) {
-    printf("add(%d, %d)\n", a, b);
-    return a + b;
-});
+// You can declare this in your header files!
+CODEDEFENDER("Profile1", int, addint, (int a, int b));
 
-CODEDEFENDER("Profile1", int, main,
-(int argc, char** argv) {
-    int result = add(3, 5);
-    printf("Result: %d\n", result);
-    return 0;
-});
+int addint(int a, int b) {
+  return a + b;
+}
 ```
 
 ### Obfuscation Profiles
