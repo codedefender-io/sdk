@@ -1,6 +1,6 @@
 [package]
 name = "codedefender"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 authors = ["Back Engineering Labs, Inc <contact@back.engineering>"]
 description = "A macro used to mark a function for obfuscation by CodeDefender"
