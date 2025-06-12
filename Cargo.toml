@@ -10,7 +10,10 @@ keywords = ["windows", "export", "linker", "macro"]
 categories = ["development-tools", "no-std"]
 
 [lib]
-proc-macro = false
+proc-macro = true
 
 [dependencies]
 paste = "1.0.15"
+proc-macro2 = "1.0.95"
+quote = "1.0.40"
+syn = { version = "2.0.102", features = ["full"] }

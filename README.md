@@ -15,11 +15,11 @@ This will include the rust crate that contains the macro `CODEDEFENDER!`.
 ```rust
 use codedefender::*;
 
-/// Obfuscate addint with obfuscation settings in "Profile1"
-CODEDEFENDER!("Profile1", fn addint(x: i32, y: i32) -> i32 {
+#[codedefender("Profile1")]
+fn addint(x: i32, y: i32) -> i32 {
     println!("add({}, {})", x, y);
     x + y
-});
+}
 ```
 
 # C/C++ Software Development
