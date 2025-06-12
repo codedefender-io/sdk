@@ -19,30 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
-
-https://www.youtube.com/watch?v=Fdcw4Mby2RI
 */
 
 #ifndef CODEDEFENDER_H
 #define CODEDEFENDER_H
-#if defined(_MSC_VER)
-#pragma pack(push, 1)
-typedef struct CodeDefenderMacro {
-  void* pFunc;
-  const char* pProfile;
-} CodeDefenderMacro;
-#pragma pack(pop)
-#else
-typedef struct __attribute__((packed)) CodeDefenderMacro {
-  void* pFunc;
-  const char* pProfile;
-} CodeDefenderMacro;
-#endif
-
 #if defined(__cplusplus)
 #define EXTERN_C extern "C"
 #else
 #define EXTERN_C extern
+#endif
+
+#if defined(_MSC_VER)
+#define CODEDEFENDER_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__) || defined(__clang__)
+#define CODEDEFENDER_NOINLINE __attribute__((noinline))
+#else
+#define CODEDEFENDER_NOINLINE
 #endif
 
 #if defined(_MSC_VER)
@@ -53,24 +45,29 @@ typedef struct __attribute__((packed)) CodeDefenderMacro {
 #define CODEDEFENDER_STRINGIFY(x) CODEDEFENDER_STRINGIFY2(x)
 
 #define CODEDEFENDER_PRAGMA_LINKER_INCLUDE(symbol) \
-  __pragma(comment(linker, "/INCLUDE:" symbol))
+  __pragma(comment(linker, "/INCLUDE:" #symbol))
 #define CODEDEFENDER_SYMBOL_NAME(fn) \
   "_"                                \
   " __cdmacro_entry_" #fn
 
-#define CODEDEFENDER(Profile, ReturnType, Func, Body)                     \
-  __declspec(noinline) ReturnType Func Body;                              \
-  CODEDEFENDER_SECTION const CodeDefenderMacro __cdmacro_entry_##Func = { \
-      (void*)(Func), Profile};                                            \
-  CODEDEFENDER_PRAGMA_LINKER_INCLUDE(                                     \
-      CODEDEFENDER_STRINGIFY(__cdmacro_entry_##Func));
+// https://www.youtube.com/watch?v=ss142Aix2Bo
+#define CODEDEFENDER(Profile, ReturnTy, Func, Params) \
+  CODEDEFENDER_NOINLINE ReturnTy Func Params;         \
+  CODEDEFENDER_SECTION const struct {                 \
+    void* pFunc;                                      \
+    char str[sizeof(Profile)];                        \
+  } __cdmacro_entry_##Func = {(void*)Func, Profile};  \
+  CODEDEFENDER_PRAGMA_LINKER_INCLUDE(__cdmacro_entry_##Func)
 
 #elif defined(__GNUC__) || defined(__clang__)
 #define CODEDEFENDER_SECTION __attribute__((section(".cdmacro"), used))
-#define NOINLINE __attribute__((noinline))
-
-#define CODEDEFENDER(Profile, ReturnType, Func, Body)                        \
-  NOINLINE ReturnType Func Body CODEDEFENDER_SECTION const CodeDefenderMacro \
-      __cdmacro_entry_##Func = {(void*)(Func), Profile};
+// https://www.youtube.com/watch?v=ss142Aix2Bo
+#define CODEDEFENDER(Profile, ReturnTy, Func, Params) \
+  CODEDEFENDER_NOINLINE ReturnTy Func Params;         \
+  CODEDEFENDER_SECTION const struct {                 \
+    void* pFunc;                                      \
+    char str[sizeof(Profile)];                        \
+  } __cdmacro_entry_##Func = {(void*)Func, Profile};  \
+  CODEDEFENDER_PRAGMA_LINKER_INCLUDE(__cdmacro_entry_##Func)
 #endif
 #endif

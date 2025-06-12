@@ -20,25 +20,27 @@ pub fn codedefender(attr: TokenStream, item: TokenStream) -> TokenStream {
     let upper_name = fn_name.to_string().to_uppercase();
     let struct_name = format_ident!("CDMacroEntry_{}", upper_name);
     let static_ident = format_ident!("CDMACRO_STATIC_{}", upper_name);
-    
+    let profile_bytes = profile_str.as_bytes();
+    let profile_len = profile_bytes.len() + 1;
+
     let expanded = quote! {
-        #[unsafe(no_mangle)]
+        #[no_mangle]
         #[inline(never)]
         #input_fn
 
         #[repr(C)]
         struct #struct_name {
             p_func: *const (),
-            p_profile: *const u8,
+            p_profile: [u8; #profile_len],
         }
-        
+
         unsafe impl Sync for #struct_name {}
 
         #[used]
-        #[unsafe(link_section = ".cdmacro")]
+        #[link_section = ".cdmacro"]
         static #static_ident: #struct_name = #struct_name {
             p_func: #fn_name as *const (),
-            p_profile: concat!(#profile_str, "\0").as_ptr(),
+            p_profile: *b concat!(#profile_str, "\0"),
         };
     };
 
