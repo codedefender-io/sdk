@@ -10,8 +10,6 @@ Simply add codedefender to your rust project with the following command:
 cargo add codedefender
 ```
 
-This will include the rust crate that contains the macro `CODEDEFENDER!`.
-
 ```rust
 use codedefender::*;
 
