@@ -40,22 +40,40 @@ int addint(int a, int b) {
 
 Profiles are defined within the configuration file created on the SaaS (https://app.codedefender.io). Here is an example of a configuration file exported from the SaaS
 
-```json
-{
-  "settings": {
-    ... // Removed for brevity
-  },
-  "profiles": [
-    {
-      "id": "475e59f5-7e01-436f-8406-02600b9b7c64",
-      "name": "Profile1", // Here is the profile name!
-      "locked": false,
-      "settings": {
-        // ... Removed for brevity
-      },
-    }
-  ]
-}
+```yaml
+version: "1.0.0"
+module_settings:
+  ida_crasher: false
+  import_protection: false
+  fake_pdb_string:
+    enabled: false
+    value: ""
+  custom_section_name:
+    enabled: false
+    value: ""
+profiles:
+  - name: "Profile1"
+    passes: # Assign your obfuscation passes here
+      - type: ObscureReferences
+      - type: ObscureConstants
+    compiler_settings:
+      assembler_settings:
+        shuffle_basic_blocks: false
+        instruction_prefix: ""
+        random_prefix_chance: 0
+      optimization_settings:
+        constant_propagation: true
+        instruction_combine: true
+        dead_code_elim: true
+        prune_useless_block_params: true
+        iterations: 0
+      lifter_settings:
+        lift_calls: true
+        max_stack_copy_size: 1024
+        split_on_calls_fallback: true
+    symbols:
+      - !Name "main" # Specify a symbol by name
+      - !Rva 0x1000  # Specify a symbol by RVA
 ```
 
 This provides an easy to obfuscate functions with pre-defined obfuscation settings.
