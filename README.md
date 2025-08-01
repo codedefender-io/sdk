@@ -36,6 +36,34 @@ int addint(int a, int b) {
 }
 ```
 
+# MASM Software Development
+
+```MASM
+include codedefender.inc
+EXTERN MessageBoxA : PROC
+
+.data
+caption     db "Hello", 0
+message     db "This is MyFunc (64-bit)!", 0
+
+.code
+PUBLIC MyFunc
+MyFunc PROC
+    sub     rsp, 28h             ; shadow space + alignment
+    mov     rcx, 0               ; hWnd = NULL
+    lea     rdx, message         ; LPCSTR lpText
+    lea     r8,  caption         ; LPCSTR lpCaption
+    mov     r9, 0                ; uType = MB_OK
+    call    MessageBoxA
+    add     rsp, 28h
+    ret
+MyFunc ENDP
+
+; Use the macro from the included file
+CODEDEFENDER "Profile1", MyFunc
+END
+```
+
 ### Obfuscation Profiles
 
 Profiles are defined within the configuration file created on the SaaS (https://app.codedefender.io). Here is an example of a configuration file exported from the SaaS
